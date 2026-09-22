@@ -35,7 +35,7 @@ def download(source: str, work_dir: Path) -> Path:
         log.info(f"using local file {source}")
         return Path(source)
 
-    existing = list(work_dir.glob("source.*"))
+    existing = _finished_download(work_dir)
     if existing:
         log.info(f"already downloaded: {existing[0].name}")
         return existing[0]
@@ -71,7 +71,12 @@ def download(source: str, work_dir: Path) -> Path:
     with yt_dlp.YoutubeDL(opts) as ydl:
         info = ydl.extract_info(source, download=True)
         log.info(f"title: {info.get('title')}")
-    return next(work_dir.glob("source.*"))
+    return _finished_download(work_dir)[0]
+
+
+def _finished_download(work_dir: Path) -> list[Path]:
+    # Ignore yt-dlp's in-progress files such as "source.f136.mp4.part".
+    return [p for p in work_dir.glob("source.*") if len(p.suffixes) == 1 and p.suffix != ".part"]
 
 
 def extract_audio(video: Path, out_wav: Path, sample_rate: int = 16_000) -> Path:
