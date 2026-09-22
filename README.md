@@ -17,6 +17,21 @@ Output lands in `output/<video-id>/`:
 | `report.json` | processing time per stage, timing accuracy, settings used |
 | `words.json`, `translated.json` | intermediate results, so an interrupted run resumes where it stopped |
 
+## Results
+
+Measured on a laptop: Intel i5-1335U, 16 GB RAM, no GPU, running the default settings.
+
+| Video | Language | Length | Processing time | Lines | On time (±0.25s) | Max drift |
+|---|---|---|---|---|---|---|
+| [Terra X: Nobelpreis 2025, Quantenphysik](https://www.youtube.com/watch?v=QbyKWvjIhP8) | German | 28m 40s | 1h 03m* | 334 | 99.1% | 0.58s |
+| [Cours d'Histoires d'Art : le XIXe siècle](https://www.youtube.com/watch?v=_hKZ7RPK3-Q) | French | 1h 58m 30s | 1h 07m | 1,281 | 99.8% | 0.69s |
+
+\*This run hit edge-tts connections that hung for minutes, and synthesis alone took 47 minutes.
+A 20-second request timeout with retry fixed it. On the 2-hour video, synthesis then took 13 minutes.
+
+Stage breakdown for the 2-hour video: download 6m, transcribe 30m, translate 14m,
+synthesize 13m, remix 4m.
+
 ## Setup
 
 Python 3.10+. ffmpeg is bundled through `imageio-ffmpeg`, so nothing needs a system install.
