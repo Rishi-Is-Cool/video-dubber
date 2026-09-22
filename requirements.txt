@@ -1,0 +1,11 @@
+yt-dlp
+faster-whisper
+ctranslate2
+tokenizers
+huggingface_hub
+edge-tts
+imageio-ffmpeg
+numpy
+soundfile
+tqdm
+anthropic
