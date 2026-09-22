@@ -42,12 +42,16 @@ def download(source: str, work_dir: Path) -> Path:
 
     import yt_dlp
 
+    last = [""]
+
     def hook(d):
         if d["status"] == "downloading":
             done = d.get("downloaded_bytes") or 0
             total = d.get("total_bytes") or d.get("total_bytes_estimate") or 0
-            pct = f"{100 * done / total:5.1f}%" if total else f"{done / 1e6:.0f} MB"
-            print(f"\r    downloading {pct}      ", end="", flush=True)
+            pct = f"{100 * done / total:3.0f}%" if total else f"{done / 1e6:.0f} MB"
+            if pct != last[0]:  # only redraw when the number changes
+                last[0] = pct
+                print(f"\r    downloading {pct}      ", end="", flush=True)
         elif d["status"] == "finished":
             print(flush=True)
 

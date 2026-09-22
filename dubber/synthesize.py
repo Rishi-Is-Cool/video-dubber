@@ -22,6 +22,7 @@ VOICES = {"male": "en-US-AndrewMultilingualNeural", "female": "en-US-AvaMultilin
 
 MAX_RATE_BOOST = 30    # at most +30% via the TTS engine's own rate (sounds natural)
 MAX_TEMPO = 1.25       # then at most another 1.25x via time-stretching
+TTS_TIMEOUT = 20       # seconds per request before retrying
 GAP = 0.08             # seconds of breathing room kept before the next line
 SR16 = 16_000
 
@@ -109,8 +110,10 @@ async def _tts_all(jobs: list[TTSJob], cache: Path, desc: str) -> None:
                     break
                 try:
                     tmp = path.with_suffix(".part")
-                    await edge_tts.Communicate(job.text, job.voice,
-                                               rate=f"{job.rate:+d}%").save(str(tmp))
+                    # edge-tts connections occasionally hang for minutes; retry instead.
+                    communicate = edge_tts.Communicate(job.text, job.voice,
+                                                       rate=f"{job.rate:+d}%")
+                    await asyncio.wait_for(communicate.save(str(tmp)), timeout=TTS_TIMEOUT)
                     tmp.replace(path)
                 except Exception:
                     await asyncio.sleep(2 ** attempt)
