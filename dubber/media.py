@@ -52,6 +52,8 @@ def download(source: str, work_dir: Path) -> Path:
             if pct != last[0]:  # only redraw when the number changes
                 last[0] = pct
                 print(f"\r    downloading {pct}      ", end="", flush=True)
+                if total:
+                    log.progress("Download", done, total)
         elif d["status"] == "finished":
             print(flush=True)
 
@@ -71,6 +73,7 @@ def download(source: str, work_dir: Path) -> Path:
     with yt_dlp.YoutubeDL(opts) as ydl:
         info = ydl.extract_info(source, download=True)
         log.info(f"title: {info.get('title')}")
+        (work_dir / "title.txt").write_text(info.get("title") or "", encoding="utf-8")
     return _finished_download(work_dir)[0]
 
 

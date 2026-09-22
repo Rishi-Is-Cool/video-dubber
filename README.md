@@ -7,6 +7,12 @@ timed to the original speech. Runs on a laptop CPU with free, open-source tools.
 python dub.py "https://www.youtube.com/watch?v=..."
 ```
 
+Or use the web page: run `python webapp.py` and open <http://127.0.0.1:5000>. Paste a link and
+click **Dub video**. The page shows each stage as it runs, then plays the result. You can switch
+between the English dub and the original at the same timestamp, and click any transcript line to
+jump to it. Earlier videos are listed at the bottom. The page is a thin layer over the same
+pipeline, and it processes one video at a time because each stage already uses every CPU core.
+
 Output lands in `output/<video-id>/`:
 
 | File | What it is |
@@ -61,7 +67,7 @@ YouTube URL
  dub track ── ffmpeg ───────► 6. Remix      audio replaced, video stream copied (no re-encode)
 ```
 
-Code layout: `dub.py` (CLI) → `dubber/pipeline.py` (orchestration, caching, report) → one
+Code layout: `dub.py` (CLI) or `webapp.py` (web page) → `dubber/pipeline.py` (orchestration, caching, report) → one
 module per concern: `media.py`, `transcribe.py`, `translate.py`, `synthesize.py`, `segments.py`.
 
 ## Design decisions

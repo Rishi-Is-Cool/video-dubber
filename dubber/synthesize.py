@@ -118,6 +118,7 @@ async def _tts_all(jobs: list[TTSJob], cache: Path, desc: str) -> None:
                 except Exception:
                     await asyncio.sleep(2 ** attempt)
             bar.update(1)
+            log.progress("Synthesize", bar.n, bar.total)
 
     await asyncio.gather(*(one(j) for j in jobs))
     bar.close()

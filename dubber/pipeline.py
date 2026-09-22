@@ -99,8 +99,11 @@ def run(opts: Options) -> Path:
         media.mux(video, dub_wav, output, background, opts.background_gain)
 
     total = time.perf_counter() - t_start
+    title_file = work / "title.txt"
+    title = title_file.read_text(encoding="utf-8").strip() if title_file.exists() else ""
     report = {
         "source": opts.source,
+        "title": title or Path(opts.source).stem,
         "video_duration_s": round(duration, 1),
         "processing_time_s": round(total, 1),
         "processing_time": log.fmt_duration(total),

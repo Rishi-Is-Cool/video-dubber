@@ -4,9 +4,14 @@
 """
 
 import argparse
+import sys
 from pathlib import Path
 
 from dubber.pipeline import Options, run
+
+# Windows consoles default to a legacy code page that can't print "→" or non-Latin titles.
+for stream in (sys.stdout, sys.stderr):
+    stream.reconfigure(encoding="utf-8", errors="replace")
 
 
 def main() -> None:

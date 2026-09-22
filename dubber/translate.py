@@ -52,6 +52,7 @@ NLLB_CODES = {
 }
 
 _SENTENCE_SPLIT = re.compile(r"(?<=[.!?।…])\s+")
+_LEADING_DASH = re.compile(r"^[-–—]\s*")
 
 
 def _translate_nllb(segments: list[Segment], source_lang: str) -> None:
@@ -86,7 +87,9 @@ def _translate_nllb(segments: list[Segment], source_lang: str) -> None:
                                         repetition_penalty=1.1, no_repeat_ngram_size=4)
         for (i, _), result in zip(batch, results):
             ids = [tokenizer.token_to_id(t) for t in result.hypotheses[0][1:]]
-            outputs[i].append(tokenizer.decode(ids, skip_special_tokens=True).strip())
+            text = tokenizer.decode(ids, skip_special_tokens=True).strip()
+            outputs[i].append(_LEADING_DASH.sub("", text))  # NLLB mimics subtitle dialogue dashes
+        log.progress("Translate", start + len(batch), len(pieces))
 
     for seg, parts in zip(segments, outputs):
         seg.english = " ".join(parts)
@@ -146,6 +149,7 @@ def _translate_claude(segments: list[Segment], source_lang: str) -> None:
             seg.english = results.get(i, "").strip()
             if not seg.english:
                 failed.append(seg)
+        log.progress("Translate", start + len(batch), len(segments))
     if failed:
         _translate_nllb(failed, source_lang)
 

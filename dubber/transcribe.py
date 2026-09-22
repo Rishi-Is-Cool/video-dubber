@@ -39,7 +39,9 @@ def transcribe(audio_wav: Path, model_size: str, language: str | None,
         for s in raw_segments:
             words += [Word(w.start, w.end, w.word) for w in s.words or []]
             bar.update(min(bar.total, round(s.end)) - bar.n)
+            log.progress("Transcribe", bar.n, bar.total)
         bar.update(bar.total - bar.n)
+        log.progress("Transcribe", bar.total, bar.total)
     return words, info.language
 
 

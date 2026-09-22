@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Dubber</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <span class="brand">Dubber</span>
+      <span class="topbar-note">YouTube → English dub · runs locally</span>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="panel">
+      <h2>New video</h2>
+      <form id="start-form" autocomplete="off">
+        <label for="url">YouTube link</label>
+        <div class="row">
+          <input id="url" name="url" type="text" placeholder="https://www.youtube.com/watch?v=…" required>
+          <button id="start-btn" type="submit" class="btn primary">Dub video</button>
+        </div>
+        <p id="form-error" class="error" hidden></p>
+
+        <details class="options">
+          <summary>Options</summary>
+          <div class="grid">
+            <label>Speech model
+              <select name="whisper_model">
+                <option value="small" selected>small (fast)</option>
+                <option value="medium">medium</option>
+                <option value="large-v3">large-v3 (most accurate, slow)</option>
+              </select>
+            </label>
+            <label>Source language
+              <select name="language">
+                <option value="" selected>Detect automatically</option>
+                <option value="de">German</option>
+                <option value="fr">French</option>
+                <option value="es">Spanish</option>
+                <option value="it">Italian</option>
+                <option value="hi">Hindi</option>
+                <option value="ja">Japanese</option>
+                <option value="ru">Russian</option>
+              </select>
+            </label>
+            <label>Translator
+              <select name="translator">
+                <option value="auto" selected>Automatic</option>
+                <option value="nllb">NLLB-200 (offline)</option>
+                <option value="claude">Claude (needs API key)</option>
+              </select>
+            </label>
+            <label>Voice
+              <select name="voice">
+                <option value="" selected>Match speaker</option>
+                <option value="en-US-AndrewMultilingualNeural">Andrew (male)</option>
+                <option value="en-US-BrianMultilingualNeural">Brian (male)</option>
+                <option value="en-US-AvaMultilingualNeural">Ava (female)</option>
+                <option value="en-US-EmmaMultilingualNeural">Emma (female)</option>
+              </select>
+            </label>
+            <label class="check"><input type="checkbox" name="multi_voice"> Separate voice per speaker (interviews)</label>
+            <label class="check"><input type="checkbox" name="keep_background"> Keep background music (slow, needs Demucs)</label>
+          </div>
+        </details>
+      </form>
+    </section>
+
+    <section id="job" class="panel" hidden>
+      <div class="panel-head">
+        <h2>Processing</h2>
+        <span id="elapsed" class="muted"></span>
+      </div>
+      <p id="job-title" class="muted small"></p>
+      <ol id="steps" class="steps"></ol>
+      <p id="job-error" class="error" hidden></p>
+      <details class="log-wrap">
+        <summary>Log</summary>
+        <pre id="log" class="log"></pre>
+      </details>
+    </section>
+
+    <section id="result" class="panel" hidden>
+      <div class="panel-head">
+        <h2 id="result-title"></h2>
+      </div>
+      <p id="result-meta" class="muted small"></p>
+
+      <div class="player-bar">
+        <div class="seg" role="tablist">
+          <button type="button" data-track="dubbed" class="active">English dub</button>
+          <button type="button" data-track="original">Original</button>
+        </div>
+        <span class="muted small">Switching keeps the same position in the video.</span>
+      </div>
+      <video id="player" controls preload="metadata"></video>
+
+      <div class="downloads">
+        <a id="dl-dubbed" class="btn" href="#">Download dubbed video</a>
+        <a id="dl-original" class="btn" href="#">Download original</a>
+      </div>
+
+      <dl id="stats" class="stats"></dl>
+
+      <h3>Transcript</h3>
+      <p class="muted small">Click a line to jump to it.</p>
+      <div class="transcript-wrap">
+        <table class="transcript">
+          <thead><tr><th class="t">Time</th><th>Original</th><th>English</th></tr></thead>
+          <tbody id="transcript"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Previous videos</h2>
+      <table class="runs">
+        <thead>
+          <tr><th>Title</th><th>Language</th><th>Length</th><th>Processing time</th><th></th></tr>
+        </thead>
+        <tbody id="runs"></tbody>
+      </table>
+      <p id="runs-empty" class="muted small" hidden>Nothing processed yet.</p>
+    </section>
+  </main>
+
+  <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>
